@@ -1,11 +1,14 @@
+import os
 import random
 import time
+import requests
+import json
 from selenium import webdriver
+from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.action_chains import ActionChains
 from fake_useragent import UserAgent
-
 
 # Specify Chrome webdriver options
 chrome_options = Options()
@@ -43,6 +46,41 @@ while(num_scrolls < 5):
     # Random mouse movement to simulate human behavior
     action = ActionChains(driver)
     action.move_by_offset(random.randint(0, 100), random.randint(0, 100)).perform()
-    
 
+# Parse HTML for links to article pages
+soup = BeautifulSoup(driver.page_source, 'html.parser')
+articles = soup.find_all('article', class_='w-full m-0')
+
+print(f"Number of articles found: {len(articles)}")
+
+links = []
+for article in articles:
+    shreddit_post = article.find('shreddit-post')
+    links.append(shreddit_post.get('content-href'))
+    
+# Perform a new fetch on each post link
+posts_data = {}
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"}
+for index, link in enumerate(links):
+    aita_post_req = requests.get(link, headers=headers)
+    aita_post_soup = BeautifulSoup(aita_post_req.content, 'html.parser')
+    post_container = aita_post_soup.find('div', class_='text-neutral-content')
+    
+    if post_container: 
+        div1 = post_container.find('div')
+        div2 = div1.find('div')
+        p_elements = div2.find_all('p')
+        post_text = '\n\n'.join(p.get_text(strip=True) for p in p_elements) # Concatenate text
+        
+        posts_data[index] = {'id': index, 'text': post_text}
+
+directory = 'data'
+file_path = os.path.join(directory, 'posts_data.json')
+
+if not os.path.exists(directory): 
+    os.makedirs(directory)
+    
+with open('data/posts_data.json', 'w') as json_file: 
+    json.dump(posts_data, json_file, indent=4)
+    
 print("Hello World")
