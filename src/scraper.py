@@ -74,6 +74,7 @@ for index, link in enumerate(links):
         
         posts_data[index] = {'id': index, 'text': post_text}
 
+# Write text data to json file
 directory = 'data'
 file_path = os.path.join(directory, 'posts_data.json')
 
@@ -83,4 +84,4 @@ if not os.path.exists(directory):
 with open('data/posts_data.json', 'w') as json_file: 
     json.dump(posts_data, json_file, indent=4)
     
-print("Hello World")
+print(f"Saved article text to {file_path}")
