@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .  
+      dockerfile: Dockerfile  
+    volumes:
+      - .:/project
+      - ./data:/project/data
+      - ./audio:/project/audio
+      - ./video:/project/video
+    environment:
+      - PYTHONPATH=/project  
+    command: ["python", "main.py"]
