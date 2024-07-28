@@ -2,7 +2,9 @@ services:
   app:
     build:
       context: .  
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
+    image: tiktokbot:latest
+    container_name: tiktokbot-container
     volumes:
       - .:/project
       - ./data:/project/data
