@@ -17,7 +17,10 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 RUN apt-get update
 RUN apt-get install -y espeak-ng
 
-COPY . .
+RUN apt-get update && apt-get install -y ffmpeg
+
+COPY src /project/src
+COPY scripts /project/scripts
 
 ENV PYTHONPATH=/project
 

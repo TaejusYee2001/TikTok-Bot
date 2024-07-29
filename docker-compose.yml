@@ -8,8 +8,9 @@ services:
     volumes:
       - .:/project
       - ./data:/project/data
-      - ./audio:/project/audio
-      - ./video:/project/video
+      - ./data/audio:/project/data/audio
+      - ./data/video:/project/data/video
+      - ./data/text:/project/data/text
     environment:
       - PYTHONPATH=/project  
     command: ["python", "main.py"]

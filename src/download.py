@@ -6,7 +6,7 @@ class Download:
         self.download_path = download_path
 
     def download_files_from_dropbox(self):
-        DROPBOX_ACCESS_TOKEN = 'sl.B54hN4V54HsjmSqVT0yL0EBpmO2fo_dasCdrgyk6aJooK2-NTMVqV_FrRffIaHE5tTrq7qS6LlHqG-HKYGIzFiu4friBwcvfK22duv4iFfkQXPEQJjF3ngiHPM00GKMC-UD6fLWBOrxM'
+        DROPBOX_ACCESS_TOKEN = 'sl.B56Q0k0JVFmRNPgHl91o3wjAQSSjS-v30wgkfYJHla0rDdUukS6GUvpIw-BspPhhZVhv9-zvK4EChGKiX3RA0_ShavmI4l_uj8wSmbcsdl_3LdUNp1yEUV1yAIDQobY8BIffJhz8BjRl'
         dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
         final_directory = 'background'
         
