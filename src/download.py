@@ -1,15 +1,28 @@
 import dropbox
 import os
+import requests
 
 class Download:
-    def __init__(self, download_path) -> None:
+    def __init__(self, download_path):
         self.download_path = download_path
 
-    def download_files_from_dropbox(self):
-        DROPBOX_ACCESS_TOKEN = 'sl.B56Q0k0JVFmRNPgHl91o3wjAQSSjS-v30wgkfYJHla0rDdUukS6GUvpIw-BspPhhZVhv9-zvK4EChGKiX3RA0_ShavmI4l_uj8wSmbcsdl_3LdUNp1yEUV1yAIDQobY8BIffJhz8BjRl'
-        dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+    def refresh_access_token(self, refresh_token, client_id, client_secret):
+        url = "https://api.dropboxapi.com/oauth2/token"
+        data = {
+            "refresh_token" : refresh_token,
+            "grant_type" : "refresh_token",
+            "client_id": client_id,
+            "client_secret" : client_secret
+        }
+        response = requests.post(url, data = data)
+        response_data = response.json()
+        return response_data['access_token']
+
+    def download_files_from_dropbox(self, access_token):
+        #access_token = 'sl.B54hN4V54HsjmSqVT0yL0EBpmO2fo_dasCdrgyk6aJooK2-NTMVqV_FrRffIaHE5tTrq7qS6LlHqG-HKYGIzFiu4friBwcvfK22duv4iFfkQXPEQJjF3ngiHPM00GKMC-UD6fLWBOrxM'
+        dbx = dropbox.Dropbox(access_token)
         final_directory = 'background'
-        
+
         try:
             # List all files in the specified folder
             result = dbx.files_list_folder("", recursive = True)
@@ -21,7 +34,7 @@ class Download:
             print(f"Downloading {entry.name}...")
             try:
                 # Download the file
-                _, res = dbx.files_download(entry.path_lower)
+                metadata, res = dbx.files_download(entry.path_lower)
                 # Save the file to the specified download path
                 with open(os.path.join(self.download_path, entry.name), 'wb') as f:
                     f.write(res.content)
