@@ -11,6 +11,9 @@ services:
       - ./data/audio:/project/data/audio
       - ./data/video:/project/data/video
       - ./data/text:/project/data/text
+      - ./background:/project/background
+      - ./background/audio_overlaid:/project/background/audio_overlaid
+      - ./background/raw:/project/background/raw
     environment:
       - PYTHONPATH=/project  
     command: ["python", "main.py"]

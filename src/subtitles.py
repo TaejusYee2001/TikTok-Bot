@@ -16,7 +16,8 @@ class Subtitles:
         return time_str
 
     def generate_srt_file(self, audio_dir, data_dir):
-        for index, file in enumerate(os.listdir(audio_dir)):
+        audio_files = sorted(os.listdir(audio_dir))
+        for index, file in enumerate(audio_files):
             file_path = os.path.join(audio_dir, file)
             print(f"Processing audio file: {file_path}")
             transcript_dict = self.model.transcribe(word_timestamps=True, audio=file_path)
@@ -37,11 +38,13 @@ class Subtitles:
                 srt_file.write(srt_content)
             print(f"SRT file created at: {srt_file_path}")
 
-    def overlay_audio(self, background_dir, audio_dir):
-        for index, file in enumerate(os.listdir(background_dir)):
-            background_video = f"{background_dir}/Background{index}.mp4"
+    def overlay_audio(self, raw_background_dir, audio_dir, output_dir):
+        num_raw_background = len(os.listdir(raw_background_dir))
+        for index, _ in enumerate(os.listdir(audio_dir)):
+            background_index = random.randint(0, num_raw_background - 1)
+            background_video = f"{raw_background_dir}/{background_index}.mp4"
             audio_file = f"{audio_dir}/{index}.wav"
-            overlaid_background_video = f"{background_dir}/{index}.mp4"
+            overlaid_background_video = f"{output_dir}/{index}.mp4"
             
             add_audio_command = [
                 'ffmpeg',
@@ -51,20 +54,21 @@ class Subtitles:
                 '-c:a', 'aac',  # You can change this to 'copy' if you want to keep the original audio codec
                 '-map', '0:v:0',
                 '-map', '1:a:0',
+                '-y',
                 overlaid_background_video
             ]
             try:
                 add_audio_result = subprocess.run(add_audio_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 print(f"Video with audio created at: {overlaid_background_video}")
-                logging.debug(add_audio_result.stdout)
-                logging.debug(add_audio_result.stderr)
+                print(add_audio_result.stdout)
+                print(add_audio_result.stderr)
             except subprocess.CalledProcessError as e:
-                logging.error(f"Failed to overlay audio: {e.stderr}")
+                print(f"Failed to overlay audio: {e.stderr}")
                 
     def overlay_subtitles(self, background_dir, data_dir, video_dir):
         for index, file in enumerate(os.listdir(background_dir)):
             background_video = f"{background_dir}/{index}.mp4"
-            subtitles_file = f"{data_dir}/{index}.srt"
+            subtitles_file = f"{data_dir}/srt_files/{index}.srt"
             subtitled_video_file = f"{video_dir}/{index}.mp4"
             
             add_subtitles_command = [
@@ -72,14 +76,15 @@ class Subtitles:
                 '-i', background_video,
                 '-vf', f"subtitles={subtitles_file}:force_style='FontName=Arial,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,BorderStyle=1,Outline=3'", # TODO: format 
                 '-c:a', 'copy',
+                '-y',
                 subtitled_video_file
             ]
             
             try:
                 add_subtitles_result = subprocess.run(add_subtitles_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                logging.info(f"Subtitled video created at: {subtitled_video_file}")
-                logging.debug(add_subtitles_result.stdout)
-                logging.debug(add_subtitles_result.stderr)
+                print(f"Subtitled video created at: {subtitled_video_file}")
+                print(add_subtitles_result.stdout)
+                print(add_subtitles_result.stderr)
             except subprocess.CalledProcessError as e:
                 logging.error(f"Failed to overlay subtitles: {e.stderr}")
             

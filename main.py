@@ -1,6 +1,5 @@
 import os
 import torch
-import logging
 
 from src.scraper import RedditScraper
 from src.tts import TTS
@@ -8,16 +7,23 @@ from src.download import Download
 from src.subtitles import Subtitles
                         
 print("Starting the application")
-print("This is a debug message")
 
 site_url = "https://www.reddit.com/r/AmItheAsshole/"
 data_dir = "data/text"
+srt_files_dir = "data/text/srt_files"
 audio_dir = "data/audio"
 video_dir = "data/video"
-raw_background_dir = "processed/background"
-overlaid_background_dir = "processed/background+audio"
+raw_background_dir = "background/raw"
+overlaid_background_dir = "background/audio_overlaid"
 
-for directory in [data_dir, audio_dir, video_dir, raw_background_dir, overlaid_background_dir]:
+for directory in [
+    data_dir, 
+    audio_dir, 
+    video_dir, 
+    raw_background_dir, 
+    overlaid_background_dir, 
+    srt_files_dir
+]:
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -33,9 +39,8 @@ for directory in [data_dir, audio_dir, video_dir, raw_background_dir, overlaid_b
 #downloader.download_files_from_dropbox()
 
 subtitles = Subtitles()
-print(os.path.join(data_dir, "srt_files"))
-subtitles.generate_srt_file(audio_dir, os.path.join(data_dir, "srt_files"))
-#subtitles.overlay_audio(raw_background_dir, audio_dir)
-#subtitles.overlay_subtitles("background+audio", data_dir, video_dir)
+#subtitles.generate_srt_file(audio_dir, srt_files_dir)
+#subtitles.overlay_audio(raw_background_dir, audio_dir, overlaid_background_dir)
+subtitles.overlay_subtitles(overlaid_background_dir, data_dir, video_dir)
 
 print("Success!")

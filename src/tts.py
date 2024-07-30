@@ -30,19 +30,21 @@ class TTS:
 
         return text
         
-    def convert_to_audio(self, posts_data, audio_dir):
-        with open(posts_data, 'r') as file:
+    def convert_to_audio(self, text_data, output_dir):
+        with open(text_data, 'r') as file:
             data = json.load(file)
 
         for key, value in data.items():
             text = value['text']
+            print("preprocessing text")
+            print("key: ", key)
+            print("text: ", text)
             text = self.preprocess_text(text)
-            print(text)
             
-            #audio_path = os.path.join(audio_dir, f"{key}.wav")
-            
-            #try:
-            #    self.tts.tts_to_file(text=text, file_path=audio_path)
-            #except Exception as e:
-            #    print(f"Error processing text for key {key}: {e}")
+            audio_path = os.path.join(output_dir, f"{key}.wav")
+            print(f"Saving output srt file to {audio_path}")
+            try:
+                self.tts.tts_to_file(text=text, file_path=audio_path)
+            except Exception as e:
+                print(f"Error processing text for key {key}: {e}")
  

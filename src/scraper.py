@@ -3,7 +3,6 @@ import time
 import json
 import random
 import string
-import logging
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -34,18 +33,18 @@ class RedditScraper:
         try: 
             self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         except Exception as e: 
-            logging.error(f"Failed to initialize WebDriver: {str(e)}")
+            print(f"Failed to initialize WebDriver: {str(e)}")
             raise
 
     def scrape_posts(self, output_dir):
         try: 
-            logging.info(f"Navigating to URL: {self.url}")
+            print(f"Navigating to URL: {self.url}")
             self.driver.get(self.url)
             
             WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
-            logging.info("Page loaded successfully")
+            print("Page loaded successfully")
             
             # Browser automation to cache more posts by scrolling
             num_scrolls = 0
@@ -54,16 +53,16 @@ class RedditScraper:
                 time.sleep(self.pause_time + random.uniform(0.5, 1.5))
                 
                 num_scrolls += 1
-                logging.info(f"Completed scroll {num_scrolls}")
+                print(f"Completed scroll {num_scrolls}")
                 
             # Parse HTML for links to article pages
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
             articles = soup.find_all('article', class_='w-full m-0')
             
-            logging.info(f"Number of articles found: {len(articles)}")
+            print(f"Number of articles found: {len(articles)}")
             
             if not articles:
-                logging.warning("No articles found. The HTML structure might have changed.")
+                print("No articles found. The HTML structure might have changed.")
                 return
             
             links = []
@@ -92,11 +91,11 @@ class RedditScraper:
             with open(file_path, 'w') as json_file:
                 json.dump(self.posts_data, json_file, indent=4)
             
-            logging.info(f"Saved article text to {file_path}")
+            print(f"Saved article text to {file_path}")
 
         except Exception as e:
-            logging.error(f"An error occurred during scraping: {str(e)}")
+            print(f"An error occurred during scraping: {str(e)}")
             raise
         finally:
             self.driver.quit()
-            logging.info("WebDriver closed")
+            print("WebDriver closed")
