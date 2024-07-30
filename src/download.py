@@ -4,6 +4,7 @@ import requests
 
 class Download:
     def __init__(self, download_path):
+        print("Initializing downloader...")
         self.download_path = download_path
 
     def refresh_access_token(self, refresh_token, client_id, client_secret):
@@ -21,7 +22,6 @@ class Download:
     def download_files_from_dropbox(self, access_token):
         #access_token = 'sl.B54hN4V54HsjmSqVT0yL0EBpmO2fo_dasCdrgyk6aJooK2-NTMVqV_FrRffIaHE5tTrq7qS6LlHqG-HKYGIzFiu4friBwcvfK22duv4iFfkQXPEQJjF3ngiHPM00GKMC-UD6fLWBOrxM'
         dbx = dropbox.Dropbox(access_token)
-        final_directory = 'background'
 
         try:
             # List all files in the specified folder

@@ -15,5 +15,6 @@ services:
       - ./background/audio_overlaid:/project/background/audio_overlaid
       - ./background/raw:/project/background/raw
     environment:
-      - PYTHONPATH=/project  
-    command: ["python", "main.py"]
+      - PYTHONPATH=/project
+      - PYTHONBUFFERED=1
+    command: ["python", "-u", "main.py"]

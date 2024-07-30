@@ -9,6 +9,9 @@ data/audio
 data/video
 data/text
 
+background/audio_overlaid
+background/raw
+
 results
 docs
 tests

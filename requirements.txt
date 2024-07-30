@@ -28,3 +28,4 @@ TTS
 dropbox
 ffmpeg
 openai-whisper
+python-dotenv

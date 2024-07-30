@@ -15,6 +15,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 class RedditScraper: 
     def __init__(self, url, scrolls=2, pause_time=2):
+        print("Initializing WebScraper...")
         self.url = url
         self.scrolls = scrolls
         self.pause_time = pause_time

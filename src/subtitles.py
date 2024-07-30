@@ -1,27 +1,51 @@
 import os
+import time
 import ffmpeg
 import random
 import whisper
 import logging
 import subprocess
+from urllib.error import URLError
+
+# TODO: make sure to redo index counting -- save the number of articles fetched by the scraper 
+# and use this for the loop iteration count. 
 
 class Subtitles: 
-    def __init__(self): 
-        self.model = whisper.load_model('base', in_memory=True)
+    def __init__(self, retries=5, delay=5):
+        print("Initializing subtitle generator...")
+        self.model = self.load_model_with_retries('base', retries, delay)
         print("Whisper model loaded successfully.")
+
+    def load_model_with_retries(self, model_name, retries, delay):
+        attempt = 0
+        while attempt < retries:
+            try:
+                model = whisper.load_model(model_name)
+                return model
+            except URLError as e:
+                print(f"Network error encountered: {e}. Retrying in {delay} seconds... (Attempt {attempt + 1}/{retries})")
+                time.sleep(delay)
+                attempt += 1
+        raise Exception("Failed to load the Whisper model after multiple retries due to network issues.")
+
         
     def seconds_to_srt_time(self, seconds):
         millisec = int((seconds - int(seconds)) * 1000)
         time_str = f"{int(seconds // 3600):02}:{int((seconds % 3600) // 60):02}:{int(seconds % 60):02},{millisec:03}"
         return time_str
 
-    def generate_srt_file(self, audio_dir, data_dir):
-        audio_files = sorted(os.listdir(audio_dir))
-        for index, file in enumerate(audio_files):
-            file_path = os.path.join(audio_dir, file)
-            print(f"Processing audio file: {file_path}")
-            transcript_dict = self.model.transcribe(word_timestamps=True, audio=file_path)
-            print(f"Transcription completed for: {file_path}")
+    def generate_srt_file(self, audio_dir, srt_files_dir):
+        print("Generating SRT files...")
+        for index, _ in enumerate(os.listdir(audio_dir)):
+            audio_file = f"{audio_dir}/{index}.wav"
+            
+            if not os.path.exists(audio_file): 
+                print(f"Audio file does not exist: {audio_file}. Skipping...")
+                continue
+
+            print(f"Processing audio file: {audio_file}")
+            transcript_dict = self.model.transcribe(word_timestamps=True, audio=audio_file)
+            print(f"Transcription completed for: {audio_file}")
 
             srt_content = ""
             counter = 1
@@ -33,17 +57,23 @@ class Subtitles:
                     srt_content += f"{counter}\n{start_time} --> {end_time}\n{text.strip()}\n\n"
                     counter += 1
             
-            srt_file_path = os.path.join(data_dir, f"{index}.srt")
+            srt_file_path = f"{srt_files_dir}/{index}.srt"
             with open(srt_file_path, 'w', encoding='utf-8') as srt_file:
                 srt_file.write(srt_content)
             print(f"SRT file created at: {srt_file_path}")
 
     def overlay_audio(self, raw_background_dir, audio_dir, output_dir):
+        print("Overlaying audio...")
         num_raw_background = len(os.listdir(raw_background_dir))
         for index, _ in enumerate(os.listdir(audio_dir)):
             background_index = random.randint(0, num_raw_background - 1)
             background_video = f"{raw_background_dir}/{background_index}.mp4"
             audio_file = f"{audio_dir}/{index}.wav"
+            
+            if not os.path.exists(audio_file): 
+                print(f"Audio file does not exist: {audio_file}. Skipping...")
+                continue
+
             overlaid_background_video = f"{output_dir}/{index}.mp4"
             
             add_audio_command = [
@@ -66,7 +96,8 @@ class Subtitles:
                 print(f"Failed to overlay audio: {e.stderr}")
                 
     def overlay_subtitles(self, background_dir, data_dir, video_dir):
-        for index, file in enumerate(os.listdir(background_dir)):
+        print("Overlaying subtitles...")
+        for index, _ in enumerate(os.listdir(background_dir)):
             background_video = f"{background_dir}/{index}.mp4"
             subtitles_file = f"{data_dir}/srt_files/{index}.srt"
             subtitled_video_file = f"{video_dir}/{index}.mp4"

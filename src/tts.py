@@ -7,6 +7,7 @@ from TTS.api import TTS as text_to_speech
 
 class TTS: 
     def __init__(self, device):
+        print("Initializing TTS...")
         self.device = device
         self.tts = text_to_speech("tts_models/en/ljspeech/fast_pitch", False).to(device)
         
@@ -37,8 +38,6 @@ class TTS:
         for key, value in data.items():
             text = value['text']
             print("preprocessing text")
-            print("key: ", key)
-            print("text: ", text)
             text = self.preprocess_text(text)
             
             audio_path = os.path.join(output_dir, f"{key}.wav")

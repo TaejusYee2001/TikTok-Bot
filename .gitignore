@@ -1,7 +1,5 @@
 \tiktokbotenv
-\audio
-\video
 \data
 \background
-\background+audio
 \__pycache__
+.env
