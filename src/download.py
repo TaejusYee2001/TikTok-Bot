@@ -29,14 +29,15 @@ class Download:
         except dropbox.exceptions.ApiError as err:
             print(f"Failed to list folder contents: {err}")
             return
-        for entry in result.entries:
+        for index, entry in enumerate(result.entries):
             # Check if the entry is a file and if it is a video file
             print(f"Downloading {entry.name}...")
             try:
                 # Download the file
                 metadata, res = dbx.files_download(entry.path_lower)
                 # Save the file to the specified download path
-                with open(os.path.join(self.download_path, entry.name), 'wb') as f:
+                file_name = f"{self.download_path}/{index}.mp4"
+                with open(file_name, 'wb') as f:
                     f.write(res.content)
                 print(f"Downloaded {entry.name} successfully.")
             except dropbox.exceptions.ApiError as err:

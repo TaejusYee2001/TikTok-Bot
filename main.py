@@ -37,7 +37,7 @@ for directory in [
         os.makedirs(directory)
 
 scraper = RedditScraper(site_url)
-scraper.scrape_posts(data_dir)
+num_articles = scraper.scrape_posts(data_dir)
 
 tts = TTS(device)
 tts.convert_to_audio(os.path.join(data_dir, 'posts_data.json'), audio_dir)
@@ -46,8 +46,8 @@ downloader = Download(raw_background_dir)
 access_token = downloader.refresh_access_token(refresh_token, client_id, client_secret)
 downloader.download_files_from_dropbox(access_token)
 
-subtitles = Subtitles()
-subtitles.generate_srt_file(audio_dir, srt_files_dir)
+subtitles = Subtitles(num_articles)
+subtitles.generate_srt_files(audio_dir, srt_files_dir)
 subtitles.overlay_audio(raw_background_dir, audio_dir, overlaid_background_dir)
 subtitles.overlay_subtitles(overlaid_background_dir, data_dir, video_dir)
 

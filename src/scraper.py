@@ -100,3 +100,5 @@ class RedditScraper:
         finally:
             self.driver.quit()
             print("WebDriver closed")
+
+        return len(articles)

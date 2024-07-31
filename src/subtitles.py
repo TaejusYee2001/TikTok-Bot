@@ -11,7 +11,8 @@ from urllib.error import URLError
 # and use this for the loop iteration count. 
 
 class Subtitles: 
-    def __init__(self, retries=5, delay=5):
+    def __init__(self, num_articles, retries=5, delay=5):
+        self.num_articles = num_articles
         print("Initializing subtitle generator...")
         self.model = self.load_model_with_retries('base', retries, delay)
         print("Whisper model loaded successfully.")
@@ -34,9 +35,9 @@ class Subtitles:
         time_str = f"{int(seconds // 3600):02}:{int((seconds % 3600) // 60):02}:{int(seconds % 60):02},{millisec:03}"
         return time_str
 
-    def generate_srt_file(self, audio_dir, srt_files_dir):
+    def generate_srt_files(self, audio_dir, srt_files_dir):
         print("Generating SRT files...")
-        for index, _ in enumerate(os.listdir(audio_dir)):
+        for index in range(self.num_articles):
             audio_file = f"{audio_dir}/{index}.wav"
             
             if not os.path.exists(audio_file): 
@@ -65,13 +66,17 @@ class Subtitles:
     def overlay_audio(self, raw_background_dir, audio_dir, output_dir):
         print("Overlaying audio...")
         num_raw_background = len(os.listdir(raw_background_dir))
-        for index, _ in enumerate(os.listdir(audio_dir)):
+        for index in range(self.num_articles):
             background_index = random.randint(0, num_raw_background - 1)
             background_video = f"{raw_background_dir}/{background_index}.mp4"
             audio_file = f"{audio_dir}/{index}.wav"
             
             if not os.path.exists(audio_file): 
                 print(f"Audio file does not exist: {audio_file}. Skipping...")
+                continue
+
+            if not os.path.exists(background_video):
+                print(f"Background video file does not exist: {background_video}. Skipping...")
                 continue
 
             overlaid_background_video = f"{output_dir}/{index}.mp4"
@@ -97,10 +102,18 @@ class Subtitles:
                 
     def overlay_subtitles(self, background_dir, data_dir, video_dir):
         print("Overlaying subtitles...")
-        for index, _ in enumerate(os.listdir(background_dir)):
+        for index in range(self.num_articles):
             background_video = f"{background_dir}/{index}.mp4"
             subtitles_file = f"{data_dir}/srt_files/{index}.srt"
             subtitled_video_file = f"{video_dir}/{index}.mp4"
+            
+            if not os.path.exists(subtitles_file):
+                print(f"Subtitles file does not exist: {subtitles_file}. Skipping...")
+                continue
+
+            if not os.path.exists(background_video):
+                print(f"Background video file does not exist: {background_video}. Skipping...")
+                continue
             
             add_subtitles_command = [
                 'ffmpeg',

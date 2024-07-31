@@ -41,7 +41,7 @@ class TTS:
             text = self.preprocess_text(text)
             
             audio_path = os.path.join(output_dir, f"{key}.wav")
-            print(f"Saving output srt file to {audio_path}")
+            print(f"Saving output .wav file to {audio_path}")
             try:
                 self.tts.tts_to_file(text=text, file_path=audio_path)
             except Exception as e:
