@@ -3,6 +3,7 @@ Welcome to the new project!
 
 ## 🤖 Social Media Automation Tool
 Developers: Calvin Yee, Taejus Yee
+
 Technologies: Python, Selenium, BeautifulSoup, FFmpeg, Docker, OpenAI (Whisper)
 
 ## 🚀 Project Overview
