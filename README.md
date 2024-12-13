@@ -17,10 +17,10 @@ Utilizes Selenium and BeautifulSoup to scrape Reddit posts while bypassing anti-
 Supports multiple TTS Options, originally using the free version of 11Labs, then moving to the TTS and gtts libraries.
 
 ### AI-Driven Subtitle Generation:
-Uses OpenAI's Whisper model to automatically generate subtitle files from TTS audio. This improves the efficiency and accuracy of subtitle creation.
+Uses OpenAI's Whisper model to automatically generate subtitle files from TTS audio. 
 
 ### Optimized Subtitle Preprocessing:
-Improved text preprocessing pipelines, reducing subtitle interpolation times by 50% and decreasing hallucination rates in Whisper model outputs.
+Improved text preprocessing pipelines, decreasing hallucination rates in Whisper model outputs.
 
 
 ## 🛠️ Technologies Used
